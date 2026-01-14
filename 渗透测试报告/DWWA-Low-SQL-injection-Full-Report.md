@@ -70,6 +70,6 @@
 ## 💡 漏洞原理深度分析
 - **根本原因**: DVWA在Low级别下，直接将用户输入 `id` 拼接进SQL查询语句，未做任何过滤或参数化处理。
 - **关键语句还原**: `SELECT first_name, last_name FROM users WHERE user_id = '$id'`
-- **注入后语句**: 当输入 `1' UNION SELECT 1, database() --` 时，实际执行的语句变为：
-  ```sql
- SELECT first_name, last_name FROM users WHERE user_id = '1' UNION SELECT 1, database() -- '
+注入后语句: 当输入 `1' UNION SELECT 1, database() -- ` 时，实际执行的语句变为：
+```sql
+SELECT first_name, last_name FROM users WHERE user_id = '1' UNION SELECT 1, database() -- '
